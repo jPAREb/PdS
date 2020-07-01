@@ -12,6 +12,7 @@
 #include "processador_nuclis.h"
 #include "_RAM_.h"
 #include "Banderes.h"
+#include "llista_serveis.h"
 using namespace std;
 
 vector<wchar_t> programes;
@@ -160,6 +161,7 @@ int explicacio() {
 }
 
 void proces(int llengua) {
+    vector<string> llista_serveis;
     int opcio_accio;
     cout << llengua;
     vector <ULARGE_INTEGER> memoria;
@@ -223,11 +225,19 @@ void proces(int llengua) {
             }
             break;
         case 4:
+            system("CLS");
+            evitar_cout("--------------------");
+            evitar_cout("-      SERVEIS     -");
+            evitar_cout("--------------------");
+            Sleep(1000);
             LPCWSTR name;
-            //MessageBox(NULL, TEXT("Goodbye, cruel world!"), TEXT("Note"), MB_OK);
-            servei_estat(TEXT("SgrmBroker"));
-            servei_estat(TEXT("p2psvc"));
-            servei_estat(TEXT("KeyIso"));
+            llista_serveis = llista_servei();
+            for (int i = 0; i < llista_serveis.size(); i++)
+            {
+                wstring stemp = wstring(llista_serveis.at(i).begin(), llista_serveis.at(i).end());
+                LPCWSTR sw = stemp.c_str();
+                servei_estat(sw);
+            }
             break;
         case 99:
             break;

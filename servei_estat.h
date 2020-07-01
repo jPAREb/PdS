@@ -3,9 +3,22 @@
 #include <windows.h>
 #include <Lmcons.h>
 #include <vector>
+void SetConsoleColour(WORD* Attributes, DWORD Colour)
+{
+    CONSOLE_SCREEN_BUFFER_INFO Info;
+    HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleScreenBufferInfo(hStdout, &Info);
+    *Attributes = Info.wAttributes;
+    SetConsoleTextAttribute(hStdout, Colour);
+}
+void ResetConsoleColour(WORD Attributes)
+{
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), Attributes);
+}
+
 int servei_estat(LPCWSTR Nom_servei)
 {
-
+    WORD Attributes = 0;
     LPCWSTR serviceName = Nom_servei;
 
     SC_HANDLE sch = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
@@ -30,15 +43,23 @@ int servei_estat(LPCWSTR Nom_servei)
     }
 
     if (stat.dwCurrentState == SERVICE_RUNNING) {
-
-        wprintf(TEXT("El servei '%s' està corrent\n"), serviceName);
+        SetConsoleColour(&Attributes, BACKGROUND_INTENSITY | BACKGROUND_GREEN);
+        wprintf(TEXT("'%s' [CORRENT]"), serviceName);
+        SetConsoleColour(&Attributes, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+        printf("\n");
+        
     }
     else {
-        wprintf(TEXT("El servei '%s' està innactiu\n"), serviceName);
+        SetConsoleColour(&Attributes, BACKGROUND_INTENSITY | BACKGROUND_RED);
+        wprintf(TEXT("'%s' [APAGAT]"), serviceName);
+        SetConsoleColour(&Attributes, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
+        printf("\n");
+        
+        
     }
 
     CloseServiceHandle(svc);
     CloseServiceHandle(sch);
-
+    SetConsoleColour(&Attributes, FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN);
     return 0;
 }
